@@ -8,7 +8,9 @@ import com.dsatracker.model.Topic;
 import com.dsatracker.service.ProblemService;
 import com.dsatracker.service.StatisticsService;
 import com.dsatracker.sort.ProblemSorter;
+import com.dsatracker.util.CsvExporter;
 import com.dsatracker.util.DemoDataGenerator;
+import com.dsatracker.util.HtmlReportGenerator;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -35,7 +37,7 @@ public class ConsoleUI {
         boolean running = true;
         while (running) {
             printMainMenu();
-            String input = readInput("Enter your choice (1-10): ");
+            String input = readInput("Enter your choice (1-12): ");
             switch (input.trim()) {
                 case "1":
                     handleAddProblem();
@@ -65,11 +67,17 @@ public class ConsoleUI {
                     handleLoadDemoData();
                     break;
                 case "10":
+                    handleExportCsv();
+                    break;
+                case "11":
+                    handleExportHtml();
+                    break;
+                case "12":
                     running = false;
                     System.out.println("\nThank you for using DSA Problem Tracker. Keep practicing & happy coding!\n");
                     break;
                 default:
-                    System.out.println("\n[!] Invalid option. Please enter a number between 1 and 10.\n");
+                    System.out.println("\n[!] Invalid option. Please enter a number between 1 and 12.\n");
             }
         }
     }
@@ -92,7 +100,9 @@ public class ConsoleUI {
         System.out.println(" [7]  🗑️  Delete Problem");
         System.out.println(" [8]  📊 View Statistics & Performance Dashboard");
         System.out.println(" [9]  🚀 Load Sample Demo Problems");
-        System.out.println(" [10] ❌ Exit Application");
+        System.out.println(" [10] 📁 Export Problems to CSV (Excel File)");
+        System.out.println(" [11] 🌐 Generate & Open Web HTML Dashboard");
+        System.out.println(" [12] ❌ Exit Application");
         System.out.println("-------------------------------------------------------------------");
     }
 
@@ -326,6 +336,31 @@ public class ConsoleUI {
         List<Problem> demo = DemoDataGenerator.getSampleProblems();
         problemService.loadDemoData(demo);
         System.out.println("✔ Successfully loaded " + demo.size() + " sample DSA problems into storage!");
+    }
+
+    private void handleExportCsv() {
+        System.out.println("\n--- 📁 EXPORT PROBLEMS TO CSV (EXCEL FILE) ---");
+        String filePath = "data/problems_export.csv";
+        boolean success = CsvExporter.exportToCsv(problemService.getAllProblems(), filePath);
+        if (success) {
+            System.out.println("✔ Successfully exported " + problemService.getAllProblems().size() + " problems to: " + new java.io.File(filePath).getAbsolutePath());
+        } else {
+            System.out.println("[!] Failed to export CSV file.");
+        }
+    }
+
+    private void handleExportHtml() {
+        System.out.println("\n--- 🌐 GENERATE & OPEN WEB HTML DASHBOARD ---");
+        String filePath = "data/dashboard.html";
+        StatisticsService.SummaryReport report = problemService.getStatistics();
+        boolean success = HtmlReportGenerator.generateHtmlReport(problemService.getAllProblems(), report, filePath);
+        if (success) {
+            System.out.println("✔ Interactive Web Dashboard generated successfully at: " + new java.io.File(filePath).getAbsolutePath());
+            System.out.println("Opening dashboard in your web browser...");
+            HtmlReportGenerator.openInBrowser(filePath);
+        } else {
+            System.out.println("[!] Failed to generate HTML Dashboard.");
+        }
     }
 
     private Topic selectTopicPrompt() {

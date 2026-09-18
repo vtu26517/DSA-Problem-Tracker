@@ -15,7 +15,9 @@ A console-based application built in **Java** leveraging the **Java Collections 
 - **Modular OOP-based Architecture**: Clean separation into domain models (`Problem`, `Topic`, `Difficulty`, `Status`), repository abstraction (`ProblemRepository`), service layers (`ProblemService`, `StatisticsService`), and presentation layer (`ConsoleUI`, `TableFormatter`).
 - **Statistics & Performance Analytics Module**: Analyze topic-wise distribution, difficulty breakdown (Easy/Medium/Hard), completion percentages, average time spent per topic/difficulty, and top practiced topics.
 - **Persistent Storage**: Data automatically saved to `data/problems.json` using custom serialization without third-party dependencies.
-- **Structured Interactive UI**: Clean ASCII banners, formatted tabular views, colorized difficulty levels, interactive menu options, and sample demo data generation.
+- **CSV & Web HTML Exporters**:
+  - Export problem lists directly to Microsoft Excel CSV format (`data/problems_export.csv`).
+  - Generate an interactive Web HTML Dashboard (`data/dashboard.html`) with CSS cards, progress bars, and formatted tables that open directly in your web browser.
 
 ---
 

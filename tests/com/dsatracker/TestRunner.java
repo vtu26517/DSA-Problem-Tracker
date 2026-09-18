@@ -10,7 +10,9 @@ import com.dsatracker.repository.ProblemRepository;
 import com.dsatracker.service.ProblemService;
 import com.dsatracker.service.StatisticsService;
 import com.dsatracker.sort.ProblemSorter;
+import com.dsatracker.util.CsvExporter;
 import com.dsatracker.util.DemoDataGenerator;
+import com.dsatracker.util.HtmlReportGenerator;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -31,6 +33,7 @@ public class TestRunner {
         testCollectionsFiltering();
         testStatisticsCalculations();
         testSearchAndKeywordMatching();
+        testExporters();
 
         System.out.println("\n----------------------------------------------------------");
         System.out.printf("  TEST RESULTS: %d PASSED, %d FAILED\n", testsPassed, testsFailed);
@@ -140,5 +143,24 @@ public class TestRunner {
 
         List<Problem> noteResults = ProblemFilter.searchByKeyword(sample, "Patience Sorting");
         assertCondition("Search Notes Keyword", noteResults.size() == 1 && noteResults.get(0).getTitle().contains("Longest Increasing Subsequence"));
+    }
+
+    private static void testExporters() {
+        System.out.println("\n[7] Testing CSV & HTML Dashboard Exporters...");
+        List<Problem> sample = DemoDataGenerator.getSampleProblems();
+        StatisticsService statsService = new StatisticsService();
+        StatisticsService.SummaryReport report = statsService.generateReport(sample);
+
+        String csvPath = "data/test_export.csv";
+        boolean csvOk = CsvExporter.exportToCsv(sample, csvPath);
+        File csvFile = new File(csvPath);
+        assertCondition("CSV Export Execution", csvOk && csvFile.exists() && csvFile.length() > 0);
+        if (csvFile.exists()) csvFile.delete();
+
+        String htmlPath = "data/test_dashboard.html";
+        boolean htmlOk = HtmlReportGenerator.generateHtmlReport(sample, report, htmlPath);
+        File htmlFile = new File(htmlPath);
+        assertCondition("HTML Dashboard Export Execution", htmlOk && htmlFile.exists() && htmlFile.length() > 0);
+        if (htmlFile.exists()) htmlFile.delete();
     }
 }
